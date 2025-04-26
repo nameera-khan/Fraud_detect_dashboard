@@ -11,9 +11,7 @@ import seaborn as sns
 st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
 
 # Load model and scaler
-model = pickle.load(open('fraud_model.pkl', 'rb'))
-scaler = pickle.load(open('scaler.pkl', 'rb'))
-
+model = pickle.load(open('XGBmodel-3.pkl', 'rb'))
 # App Title
 st.title("🛡️ Fraudulent User Detection Dashboard")
 
