@@ -85,5 +85,5 @@ explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(selected_user)
 
 st.write("Feature impact on Fraud Prediction:")
-st.set_option('deprecation.showPyplotGlobalUse', False)
+#st.set_option('deprecation.showPyplotGlobalUse', False)
 shap.force_plot(explainer.expected_value[1], shap_values[1], selected_user, matplotlib=True)
