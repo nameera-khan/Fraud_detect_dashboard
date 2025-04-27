@@ -98,42 +98,47 @@ total_users = len(data)
 fraudulent_users = sum(data['Fraud_Label'] == 'Fraudulent')
 fraud_rate = fraudulent_users / total_users * 100
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Users", total_users)
-col2.metric("Fraudulent Users", fraudulent_users)
-col3.metric("Fraud Rate (%)", f"{fraud_rate:.2f}")
+# Create Tabs
+overview_tab, predictions_tab, explain_tab = st.tabs(["📋 Overview", "📈 Predictions", "🔍 Explainability"])
 
-st.markdown("---")
+# Overview Tab
+with overview_tab:
+    st.header("Fraud Detection KPIs")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Users", total_users)
+    col2.metric("Fraudulent Users", fraudulent_users)
+    col3.metric("Fraud Rate (%)", f"{fraud_rate:.2f}")
+    st.markdown("---")
+    st.subheader("📊 Fraud Probability Distribution")
+    fig, ax = plt.subplots()
+    sns.histplot(data['Fraud_Probability'], kde=True, bins=20)
+    st.pyplot(fig)
 
-# Fraud Scores Table
-st.subheader("🧾 User Fraud Scores")
-st.dataframe(data[['Fraud_Probability', 'Fraud_Label'] + list(data.columns[:-2])])
+# Predictions Tab
+with predictions_tab:
+    st.header("User Fraud Scores")
+    st.dataframe(data[['Fraud_Probability', 'Fraud_Label'] + list(data.columns[:-2])])
 
-# Probability Distribution
-st.subheader("📊 Fraud Probability Distribution")
-fig, ax = plt.subplots()
-sns.histplot(data['Fraud_Probability'], kde=True, bins=20)
-st.pyplot(fig)
+# Explainability Tab
+with explain_tab:
+    st.header("Explain Individual User Prediction")
+    selected_index = st.selectbox('Select User Index', data.index)
+    selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
 
-# Explainability
-st.subheader("🔍 Explain Individual User Prediction")
-selected_index = st.selectbox('Select User Index', data.index)
-selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(selected_user)
+    if isinstance(shap_values, list):
+        shap_values = shap_values[1]
 
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(selected_user)
-if isinstance(shap_values, list):
-    shap_values = shap_values[1]
+    shap_df = pd.DataFrame({
+        'feature': selected_user.columns,
+        'shap_value': shap_values.flatten()
+    })
+    shap_df['abs_shap'] = shap_df['shap_value'].abs()
+    shap_df = shap_df.sort_values('abs_shap', ascending=True)
 
-shap_df = pd.DataFrame({
-    'feature': selected_user.columns,
-    'shap_value': shap_values.flatten()
-})
-shap_df['abs_shap'] = shap_df['shap_value'].abs()
-shap_df = shap_df.sort_values('abs_shap', ascending=True)
-
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.barh(shap_df['feature'], shap_df['shap_value'])
-ax.set_xlabel("Impact on Fraud Prediction")
-ax.set_title("Top Features Influencing Prediction")
-st.pyplot(fig)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.barh(shap_df['feature'], shap_df['shap_value'])
+    ax.set_xlabel("Impact on Fraud Prediction")
+    ax.set_title("Top Features Influencing Prediction")
+    st.pyplot(fig)
