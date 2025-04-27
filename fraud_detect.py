@@ -108,6 +108,7 @@ with overview_tab:
     col1.metric("Total Users", total_users)
     col2.metric("Fraudulent Users", fraudulent_users)
     col3.metric("Fraud Rate (%)", f"{fraud_rate:.2f}")
+
     st.markdown("---")
     st.subheader("📊 Fraud Probability Distribution")
     fig, ax = plt.subplots()
@@ -116,12 +117,12 @@ with overview_tab:
 
 # Predictions Tab
 with predictions_tab:
-    st.header("User Fraud Scores")
+    st.header("🧾 User Fraud Scores")
     st.dataframe(data[['Fraud_Probability', 'Fraud_Label'] + list(data.columns[:-2])])
 
 # Explainability Tab
 with explain_tab:
-    st.header("Explain Individual User Prediction")
+    st.header("🔍 Explain Individual User Prediction")
     selected_index = st.selectbox('Select User Index', data.index)
     selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
 
@@ -134,6 +135,7 @@ with explain_tab:
         'feature': selected_user.columns,
         'shap_value': shap_values.flatten()
     })
+
     shap_df['abs_shap'] = shap_df['shap_value'].abs()
     shap_df = shap_df.sort_values('abs_shap', ascending=True)
 
