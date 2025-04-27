@@ -81,12 +81,27 @@ selected_index = st.selectbox('Select User Index', data.index)
 
 selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
 
-# Generate SHAP values
+# Calculate SHAP values
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(selected_user)
 
-# Generate SHAP force plot (interactive HTML + JS)
-force_plot_html = shap.force_plot(explainer.expected_value, shap_values, selected_user)
+# If output is a list (binary classification), select the second class
+if isinstance(shap_values, list):
+    shap_values = shap_values[1]
 
-# Render it correctly inside Streamlit
-components.html(force_plot_html.html(), height=500, scrolling=True)
+# Create a DataFrame for feature impacts
+shap_df = pd.DataFrame({
+    'feature': selected_user.columns,
+    'shap_value': shap_values.flatten()
+})
+
+# Sort features by absolute SHAP value (importance)
+shap_df['abs_shap'] = shap_df['shap_value'].abs()
+shap_df = shap_df.sort_values('abs_shap', ascending=True)
+
+# Plot
+fig, ax = plt.subplots(figsize=(8, 6))
+ax.barh(shap_df['feature'], shap_df['shap_value'])
+ax.set_xlabel("Impact on Fraud Prediction")
+ax.set_title("Top Features Influencing Prediction")
+st.pyplot(fig)
