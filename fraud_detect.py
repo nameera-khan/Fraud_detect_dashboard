@@ -1,5 +1,6 @@
 # app.py
 pip install shap
+pip install numpy
 import streamlit as st
 import pandas as pd
 import numpy as np
