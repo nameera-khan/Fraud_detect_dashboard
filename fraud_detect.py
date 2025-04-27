@@ -42,11 +42,10 @@ else:
         'High_Returner_Flag': np.random.randint(0, 2, 100)
     })
 
-# Scale data
-data_scaled = scaler.transform(data)
+
 
 # Make predictions
-pred_probs = model.predict_proba(data_scaled)[:, 1]
+pred_probs = model.predict_proba(data)[:, 1]
 data['Fraud_Probability'] = pred_probs
 data['Fraud_Label'] = np.where(data['Fraud_Probability'] > 0.5, 'Fraudulent', 'Normal')
 
