@@ -81,12 +81,12 @@ selected_index = st.selectbox('Select User Index', data.index)
 
 selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
 
-## Calculate SHAP values
+# Generate SHAP values
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(selected_user)
 
-# Generate force plot
-shap_plot = shap.force_plot(explainer.expected_value, shap_values, selected_user)
+# Generate SHAP force plot (interactive HTML + JS)
+force_plot_html = shap.force_plot(explainer.expected_value, shap_values, selected_user)
 
-# Display force plot properly
-components.html(shap_plot.html(), height=400)
+# Render it correctly inside Streamlit
+components.html(force_plot_html.html(), height=500, scrolling=True)
