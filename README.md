@@ -38,31 +38,6 @@ fraud_detect_dashboard/
 ├── README.md             # Project documentation
 ```
 
-
-## 🚀 How to Run the App Locally
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/fraud_detect_dashboard.git
-cd fraud_detect_dashboard
-```
-
-### 2. Create a Virtual Environment (Optional but Recommended)
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Run the App
-```bash
-streamlit run app.py
-```
-
 ---
 
 ## 🔥 Key Learnings
