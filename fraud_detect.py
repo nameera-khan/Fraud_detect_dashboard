@@ -6,6 +6,7 @@ import shap
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit.components.v1 as components
 
 # Set page config
 st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
@@ -80,10 +81,12 @@ selected_index = st.selectbox('Select User Index', data.index)
 
 selected_user = data.iloc[[selected_index]].drop(['Fraud_Probability', 'Fraud_Label'], axis=1)
 
-# SHAP Explanation
+## Calculate SHAP values
 explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(selected_user)
 
-st.write("Feature impact on Fraud Prediction:")
-#st.set_option('deprecation.showPyplotGlobalUse', False)
-shap.force_plot(explainer.expected_value, shap_values, selected_user, matplotlib=True)
+# Generate force plot
+shap_plot = shap.force_plot(explainer.expected_value, shap_values, selected_user)
+
+# Display force plot properly
+components.html(shap_plot.html(), height=400)
